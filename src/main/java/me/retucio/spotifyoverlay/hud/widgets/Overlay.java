@@ -1,17 +1,20 @@
 package me.retucio.spotifyoverlay.hud.widgets;
 
+import com.mojang.blaze3d.platform.NativeImage;
+import me.retucio.spotifyoverlay.SpotifyOverlay;
 import me.retucio.spotifyoverlay.hud.Widget;
 import me.retucio.spotifyoverlay.spotify.Song;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.Identifier;
 
 import java.awt.*;
 
 public class Overlay extends Widget {
 
     private final int WHITE = Color.WHITE.getRGB();
-    private final int GRAY = Color.GRAY.getRGB();
     private final int BG_COLOR = new Color(100, 100, 100, 80).getRGB();
 
     public Overlay(int x, int y, int w, int h) {
@@ -34,12 +37,23 @@ public class Overlay extends Widget {
 
         gui.fill(x, y, x + w, y + h, BG_COLOR);
 
-        int coverSize = Math.min(h - 10, 48);
-        int coverX = x + 5;
-        int coverY = y + (h - coverSize) / 2;
-        gui.fill(coverX, coverY, coverX + coverSize, coverY + coverSize, 0xFF000000);
+        int cs = Math.min(h - 10, 48);
+        int cx = x + 5;
+        int cy = y + (h - cs) / 2;
 
-        int textX = coverX + coverSize + 8;
+        NativeImage cover = SpotifyManager.INSTANCE.getAlbumCover();
+        if (cover == null) {
+            gui.fill(cx, cy, cx + cs, cy + cs, Color.BLACK.getRGB());
+        } else {
+            gui.blit(RenderPipelines.GUI_TEXTURED,
+                    Identifier.fromNamespaceAndPath(
+                            SpotifyOverlay.MOD_ID,
+                            "cover"
+                    ), cx, cy, cs, cs, cs, cs, cs, cs
+            );
+        }
+
+        int textX = cx + cs + 8;
         int textWidth = w - (textX - x) - 8;
 
         String title = current.isEmpty() ? "no song playing :(" : current.name();
@@ -53,7 +67,7 @@ public class Overlay extends Widget {
         String artistsText = current.isEmpty() ? "" : String.join(", ", current.artists());
         if (!artistsText.isEmpty()) {
             int artistsY = titleY + mc.font.lineHeight + 2;
-            gui.text(mc.font, artistsText, textX, artistsY, GRAY, false);
+            gui.text(mc.font, artistsText, textX, artistsY, WHITE, false);
         }
 
         int barWidth = w - 20 - 48;

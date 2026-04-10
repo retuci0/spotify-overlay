@@ -6,18 +6,20 @@ public class Song {
 
     private final String name;
     private final List<String> artists;
+    private final String cover;
     private final int duration;
     private final boolean empty;
 
-    public Song(String name, List<String> artists, int duration, boolean empty) {
+    public Song(String name, List<String> artists, String cover, int duration, boolean empty) {
         this.name = name;
         this.artists = artists;
+        this.cover = cover;
         this.duration = duration;
         this.empty = empty;
     }
 
     public static Song empty() {
-        return new Song("", List.of(), -1, true);
+        return new Song("",  List.of(), "", -1, true);
     }
 
     public String name() {
@@ -26,6 +28,10 @@ public class Song {
 
     public List<String> artists() {
         return artists;
+    }
+
+    public String cover() {
+        return cover;
     }
 
     public int duration() {

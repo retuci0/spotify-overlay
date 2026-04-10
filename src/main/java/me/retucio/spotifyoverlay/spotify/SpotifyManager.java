@@ -1,11 +1,17 @@
 package me.retucio.spotifyoverlay.spotify;
 
 import com.google.gson.*;
+import com.mojang.blaze3d.platform.NativeImage;
 import me.retucio.spotifyoverlay.SpotifyOverlay;
 import me.retucio.spotifyoverlay.config.Config;
 import me.retucio.spotifyoverlay.config.ConfigManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.Identifier;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,10 +21,12 @@ import java.util.Scanner;
 
 public class SpotifyManager {
 
-    public static SpotifyManager INSTANCE = new SpotifyManager();
+    public final static SpotifyManager INSTANCE = new SpotifyManager();
+    private final Minecraft mc = Minecraft.getInstance();
 
     private Song currentSong = Song.empty();
     private int currentProgress = -1;
+    private NativeImage currentCover = null;
     private boolean isPlaying = false;
 
     public void updatePlaybackState() {
@@ -28,6 +36,8 @@ public class SpotifyManager {
         }
 
         try {
+            updateAlbumCover();
+
             URL url = new URL("https://api.spotify.com/v1/me/player");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
@@ -84,13 +94,25 @@ public class SpotifyManager {
                         artists.add(artistObj.get("name").getAsString());
                     }
 
+                    String albumCoverUrl = null;
+                    if (item.has("album")) {
+                        JsonObject album = item.getAsJsonObject("album");
+                        if (album.has("images")) {
+                            JsonArray images = album.getAsJsonArray("images");
+                            if (!images.isEmpty()) {
+                                JsonObject firstImage = images.get(0).getAsJsonObject();
+                                albumCoverUrl = firstImage.get("url").getAsString();
+                            }
+                        }
+                    }
+
                     int duration = item.get("duration_ms").getAsInt();
 
                     int progress = content.get("progress_ms").getAsInt();
                     boolean playing = content.get("is_playing").getAsBoolean();
 
                     // update cache
-                    currentSong = new Song(name, artists, duration, false);
+                    currentSong = new Song(name, artists, albumCoverUrl, duration, false);
                     currentProgress = progress;
                     isPlaying = playing;
                 }
@@ -102,12 +124,56 @@ public class SpotifyManager {
         }
     }
 
+    public void updateAlbumCover() {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(currentSong.cover());
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode != 200) {
+                SpotifyOverlay.LOGGER.error("failed to fetch cover: HTTP {}", responseCode);
+            }
+
+            BufferedImage bufferedImage = ImageIO.read(conn.getInputStream());
+            if (bufferedImage == null) {
+                SpotifyOverlay.LOGGER.error("couldn't decode the image");
+            }
+
+            int width = bufferedImage.getWidth();
+            int height = bufferedImage.getHeight();
+            NativeImage nativeImage = new NativeImage(width, height, true);
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    int argb = bufferedImage.getRGB(x, y);
+                    nativeImage.setPixel(x, y, argb);
+                }
+            }
+
+            currentCover = nativeImage;
+            mc.execute(() -> mc.getTextureManager().register(Identifier.fromNamespaceAndPath(SpotifyOverlay.MOD_ID, "cover"),
+                    new DynamicTexture(() -> "cover", currentCover)));
+        } catch (Exception e) {
+            SpotifyOverlay.LOGGER.error("couldn't fetch album cover", e);
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+    }
+
     public Song getCurrentSong() {
         return currentSong;
     }
 
     public int getCurrentProgress() {
         return currentProgress;
+    }
+
+    public NativeImage getAlbumCover() {
+        return currentCover;
     }
 
     public boolean isPlaying() {

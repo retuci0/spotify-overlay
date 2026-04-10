@@ -80,9 +80,10 @@ public class SpotifyOverlay implements ModInitializer {
 		}
 
 		scheduler = Executors.newSingleThreadScheduledExecutor();
-		scheduler.scheduleAtFixedRate(() -> {
-			SpotifyManager.INSTANCE.updatePlaybackState();
-		}, 0, 2, TimeUnit.SECONDS);  // every 2 seconds
+		scheduler.scheduleAtFixedRate(
+				SpotifyManager.INSTANCE::updatePlaybackState,
+				0, 2, TimeUnit.SECONDS
+		);  // every 2 seconds
 
 		LOGGER.info("Started Spotify polling every 2 seconds");
 	}
@@ -96,11 +97,7 @@ public class SpotifyOverlay implements ModInitializer {
 
 
 	public void onKey(int key, int action) {
-		if (key == GLFW.GLFW_KEY_K && action == GLFW.GLFW_PRESS) {
-			mc.gui.getChat().addClientSystemMessage(
-					Component.nullToEmpty("current song: " + SpotifyManager.INSTANCE.getCurrentSong().name())
-			);
-		}
+
 	}
 
 	public void onClick(int button, int action) {
