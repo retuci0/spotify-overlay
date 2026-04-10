@@ -47,7 +47,7 @@ public class SpotifyManager {
 
             // token expired
             if (resCode == 401) {
-                SpotifyOverlay.LOGGER.info("Token expired, attempting refresh...");
+                SpotifyOverlay.LOGGER.info("token expired, attempting refresh...");
                 if (refreshToken()) {
                     updatePlaybackState(); // retry after refresh
                 }
@@ -58,7 +58,7 @@ public class SpotifyManager {
             if (resCode == 429) {
                 String retryAfter = conn.getHeaderField("Retry-After");
                 int waitSeconds = (retryAfter != null) ? Integer.parseInt(retryAfter) : 2;
-                SpotifyOverlay.LOGGER.warn("Rate limited, skipping this poll. Retry after {}s.", waitSeconds);
+                SpotifyOverlay.LOGGER.warn("rate limited, retrying after {}s", waitSeconds);
                 return;
             }
 
@@ -127,6 +127,7 @@ public class SpotifyManager {
     public void updateAlbumCover() {
         HttpURLConnection conn = null;
         try {
+            if (currentSong.cover().isEmpty()) return;
             URL url = new URL(currentSong.cover());
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");

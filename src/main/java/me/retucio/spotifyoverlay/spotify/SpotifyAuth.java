@@ -2,6 +2,8 @@ package me.retucio.spotifyoverlay.spotify;
 
 import me.retucio.spotifyoverlay.SpotifyOverlay;
 import me.retucio.spotifyoverlay.config.Config;
+import me.retucio.spotifyoverlay.hud.screen.AuthScreen;
+import net.minecraft.client.Minecraft;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 
 import java.awt.*;
@@ -11,26 +13,24 @@ import java.util.concurrent.CompletableFuture;
 public class SpotifyAuth {
 
     private static String codeVerifier;
+    private final static Minecraft mc = Minecraft.getInstance();
+
+    public static URI authLink = null;
+    public static boolean shouldAuth = false;
 
     public static CompletableFuture<AuthorizationCodeCredentials> authorize() {
         CompletableFuture<AuthorizationCodeCredentials> future = new CompletableFuture<>();
+        shouldAuth = true;
 
         try {
             codeVerifier = PKCEUtil.generateCodeVerifier();
             String codeChallenge = PKCEUtil.generateCodeChallenge(codeVerifier);
 
-            URI authUri = Config.getSpotifyApi()
+            authLink = Config.getSpotifyApi()
                     .authorizationCodePKCEUri(codeChallenge)
                     .scope("user-read-currently-playing user-read-playback-state")
                     .build()
                     .execute();
-
-            // open browser, if supported
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().browse(authUri);
-            } else {
-                SpotifyOverlay.LOGGER.info(authUri.toASCIIString());
-            }
 
             CallbackServer server = new CallbackServer();
             server.start();

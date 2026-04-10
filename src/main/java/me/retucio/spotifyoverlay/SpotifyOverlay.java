@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.Window;
 import me.retucio.spotifyoverlay.config.Config;
 import me.retucio.spotifyoverlay.config.ConfigManager;
 import me.retucio.spotifyoverlay.hud.Hud;
+import me.retucio.spotifyoverlay.hud.screen.AuthScreen;
+import me.retucio.spotifyoverlay.hud.screen.HudEditorScreen;
 import me.retucio.spotifyoverlay.spotify.SpotifyAuth;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
 import net.fabricmc.api.ModInitializer;
@@ -11,7 +13,6 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -50,10 +51,12 @@ public class SpotifyOverlay implements ModInitializer {
 					Config config = ConfigManager.INSTANCE.getConfig();
 					config.accessToken = creds.getAccessToken();
 					config.refreshToken = creds.getRefreshToken();
-					ConfigManager.INSTANCE.save();
 					Config.getSpotifyApi().setAccessToken(config.accessToken);
 					Config.getSpotifyApi().setRefreshToken(config.refreshToken);
 					LOGGER.info("spotify connected successfully!");
+					if (mc.screen instanceof AuthScreen screen) {
+						screen.onClose();
+					}
 
 					startPolling();
 				} catch (Exception e) {
@@ -67,10 +70,13 @@ public class SpotifyOverlay implements ModInitializer {
 
 			startPolling();
 		}
+
+		mc.execute(() -> ConfigManager.INSTANCE.apply());
 	}
 
 	public void onShutdown() {
 		LOGGER.info("shutting down");
+		ConfigManager.INSTANCE.save();
 		stopPolling();
 	}
 
@@ -84,8 +90,6 @@ public class SpotifyOverlay implements ModInitializer {
 				SpotifyManager.INSTANCE::updatePlaybackState,
 				0, 2, TimeUnit.SECONDS
 		);  // every 2 seconds
-
-		LOGGER.info("Started Spotify polling every 2 seconds");
 	}
 
 	public void stopPolling() {
@@ -97,7 +101,9 @@ public class SpotifyOverlay implements ModInitializer {
 
 
 	public void onKey(int key, int action) {
-
+		if (key == GLFW.GLFW_KEY_K && action == GLFW.GLFW_PRESS) {
+			mc.setScreen(HudEditorScreen.INSTANCE);
+		}
 	}
 
 	public void onClick(int button, int action) {

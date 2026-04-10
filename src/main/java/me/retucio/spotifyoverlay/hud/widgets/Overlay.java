@@ -2,6 +2,7 @@ package me.retucio.spotifyoverlay.hud.widgets;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import me.retucio.spotifyoverlay.SpotifyOverlay;
+import me.retucio.spotifyoverlay.config.ConfigManager;
 import me.retucio.spotifyoverlay.hud.Widget;
 import me.retucio.spotifyoverlay.spotify.Song;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
@@ -9,6 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
@@ -28,11 +30,25 @@ public class Overlay extends Widget {
 
     @Override
     protected void onClick(int mx, int my, int button, int action) {
-
+        if (action == GLFW.GLFW_PRESS) {
+            dragging = true;
+            dx = mx - x;
+            dy = my - y;
+        }
+        else if (action == GLFW.GLFW_RELEASE) {
+            dragging = false;
+            ConfigManager.INSTANCE.getConfig().x = this.x;
+            ConfigManager.INSTANCE.getConfig().y = this.y;
+        }
     }
 
     @Override
     public void render(GuiGraphicsExtractor gui, int mx, int my, float delta) {
+        if (dragging) {
+            x = mx - dx;
+            y = my - dy;
+        }
+
         Song current = SpotifyManager.INSTANCE.getCurrentSong();
 
         gui.fill(x, y, x + w, y + h, BG_COLOR);

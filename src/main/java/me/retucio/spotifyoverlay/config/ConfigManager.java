@@ -3,6 +3,8 @@ package me.retucio.spotifyoverlay.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import me.retucio.spotifyoverlay.hud.Hud;
+import me.retucio.spotifyoverlay.hud.widgets.Overlay;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
 import me.retucio.spotifyoverlay.SpotifyOverlay;
 
@@ -48,10 +50,7 @@ public class ConfigManager {
         } catch (IOException e) {
             SpotifyOverlay.LOGGER.error("couldn't load settings: ", e);
             ensure();
-            return;
         }
-
-        apply();
     }
 
     public void apply() {
@@ -59,6 +58,11 @@ public class ConfigManager {
             SpotifyOverlay.LOGGER.warn("no config to apply");
             return;
         }
+
+        Overlay overlay = Hud.INSTANCE.getOverlay();
+        overlay.setX(config.x);
+        overlay.setY(config.y);
+
         loaded = true;
         SpotifyOverlay.LOGGER.info("settings applied");
     }

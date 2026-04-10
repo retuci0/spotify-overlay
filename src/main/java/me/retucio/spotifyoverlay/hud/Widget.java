@@ -1,19 +1,26 @@
 package me.retucio.spotifyoverlay.hud;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
+import java.awt.*;
 import java.util.List;
 
 public abstract class Widget {
 
     protected final Minecraft mc = Minecraft.getInstance();
 
+    protected final int PADDING = 2;
+
     protected final String name, desc;
 
     protected int x, y, w, h;
+    protected int dx, dy;
     protected boolean visible;
+
+    protected boolean dragging;
 
     public Widget(String name, String desc, int x, int y, int w, int h) {
         this.name = name;
@@ -23,6 +30,7 @@ public abstract class Widget {
         this.w = w;
         this.h = h;
         this.visible = true;
+        this.dragging = false;
     }
 
     protected abstract void onHover(int mx, int my);
@@ -30,6 +38,15 @@ public abstract class Widget {
 
     public void render(GuiGraphicsExtractor gui, int mx, int my, float delta) {
         renderTooltip(gui, mx, my, delta);
+    }
+
+    public void renderOnHudEditor(GuiGraphicsExtractor gui, int mx, int my, float delta) {
+        int outlineColor;
+        if (Hud.INSTANCE.isSelected(this)) outlineColor = Color.GREEN.getRGB();
+        else outlineColor = Color.RED.darker().getRGB();
+
+        gui.fill(x - PADDING, y - PADDING, x + w + PADDING, y + h + PADDING, outlineColor);
+        render(gui, mx, my, delta);
     }
 
     public void renderTooltip(GuiGraphicsExtractor gui, int mx, int my, float delta) {
