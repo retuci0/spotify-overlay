@@ -14,6 +14,7 @@
     "GuiMixin",
     "KeyboardHandlerMixin",
     "MinecraftMixin",
-    "MouseHandlerMixin"
+    "MouseHandlerMixin",
+    "OptionsMixin"
   ]
 }

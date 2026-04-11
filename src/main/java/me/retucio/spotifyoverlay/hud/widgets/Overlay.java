@@ -24,22 +24,18 @@ public class Overlay extends Widget {
     }
 
     @Override
-    protected void onHover(int mx, int my) {
-
-    }
-
-    @Override
     protected void onClick(int mx, int my, int button, int action) {
         if (action == GLFW.GLFW_PRESS) {
             dragging = true;
             dx = mx - x;
             dy = my - y;
-        }
-        else if (action == GLFW.GLFW_RELEASE) {
+        } else if (action == GLFW.GLFW_RELEASE) {
             dragging = false;
             ConfigManager.INSTANCE.getConfig().x = this.x;
             ConfigManager.INSTANCE.getConfig().y = this.y;
         }
+
+        super.onClick(mx, my, button, action);
     }
 
     @Override

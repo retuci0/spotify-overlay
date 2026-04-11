@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import me.retucio.spotifyoverlay.SpotifyOverlay;
 import me.retucio.spotifyoverlay.config.Config;
 import me.retucio.spotifyoverlay.config.ConfigManager;
+import me.retucio.spotifyoverlay.util.ChatUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
@@ -12,8 +13,10 @@ import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCrede
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -29,8 +32,11 @@ public class SpotifyManager {
     private NativeImage currentCover = null;
     private boolean isPlaying = false;
 
+
+    /* update methods */
+
     public void updatePlaybackState() {
-        Config config = ConfigManager.INSTANCE.getConfig();
+        Config config = getConfig();
         if (config.accessToken == null || config.accessToken.isEmpty()) {
             return;
         }
@@ -142,6 +148,7 @@ public class SpotifyManager {
             BufferedImage bufferedImage = ImageIO.read(conn.getInputStream());
             if (bufferedImage == null) {
                 SpotifyOverlay.LOGGER.error("couldn't decode the image");
+                return;
             }
 
             int width = bufferedImage.getWidth();
@@ -165,22 +172,6 @@ public class SpotifyManager {
         }
     }
 
-    public Song getCurrentSong() {
-        return currentSong;
-    }
-
-    public int getCurrentProgress() {
-        return currentProgress;
-    }
-
-    public NativeImage getAlbumCover() {
-        return currentCover;
-    }
-
-    public boolean isPlaying() {
-        return isPlaying;
-    }
-
     private boolean refreshToken() {
         try {
             AuthorizationCodeCredentials newCreds = Config.getSpotifyApi()
@@ -202,5 +193,103 @@ public class SpotifyManager {
             SpotifyOverlay.LOGGER.error("failed to refresh token", e);
             return false;
         }
+    }
+
+
+    /* actions */
+
+    public void pauseOrResume() {
+        if (isPlaying()) {
+            pause();
+        } else {
+            resume();
+        }
+    }
+
+    public void pause() {
+        try {
+            URL url = new URL("https://api.spotify.com/v1/me/player/pause");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("PUT");
+            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write("{}".getBytes(StandardCharsets.UTF_8));
+            }
+
+            int resCode = conn.getResponseCode();
+
+            if (resCode == 204 || resCode == 200) {
+                ChatUtil.info("playback paused.");
+            } else {
+                SpotifyOverlay.LOGGER.error("couldn't pause playback: HTTP {}", resCode);
+            }
+        } catch (Exception e) {
+            SpotifyOverlay.LOGGER.error("couldn't pause playback", e);
+        }
+    }
+
+    public void resume() {
+        try {
+            URL url = new URL("https://api.spotify.com/v1/me/player/play");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("PUT");
+            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write("{}".getBytes(StandardCharsets.UTF_8));
+            }
+
+            int resCode = conn.getResponseCode();
+
+            if (resCode == 204 || resCode == 200) {
+                ChatUtil.info("playback resumed.");
+            } else {
+                SpotifyOverlay.LOGGER.error("couldn't resume playback: HTTP {}", resCode);
+            }
+        } catch (Exception e) {
+            SpotifyOverlay.LOGGER.error("couldn't resume playback", e);
+        }
+    }
+
+    // todo: impl
+
+//    public void nextTrack();
+//    public void prevTrack();
+//
+//    public void forward(int ms);
+//
+//    public void backward(int ms) {
+//        forward(-ms);
+//    }
+//
+//    public void increaseVolume();
+//    public void decreaseVolume();
+//
+//    public void toggleShuffle();
+
+
+    /* getters */
+
+    public Song getCurrentSong() {
+        return currentSong;
+    }
+
+    public int getCurrentProgress() {
+        return currentProgress;
+    }
+
+    public NativeImage getAlbumCover() {
+        return currentCover;
+    }
+
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    public Config getConfig() {
+        return ConfigManager.INSTANCE.getConfig();
     }
 }

@@ -29,7 +29,13 @@ public class HudEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(@NonNull MouseButtonEvent event, boolean doubleClick) {
-        return super.mouseClicked(event, doubleClick);
+    public boolean mouseClicked(@NonNull MouseButtonEvent event, boolean doubled) {
+        return super.mouseClicked(event, doubled);
+    }
+
+    @Override
+    public void onClose() {
+        Hud.INSTANCE.select(null);
+        super.onClose();
     }
 }

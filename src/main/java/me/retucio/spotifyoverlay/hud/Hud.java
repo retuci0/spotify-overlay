@@ -1,8 +1,7 @@
 package me.retucio.spotifyoverlay.hud;
 
-import me.retucio.spotifyoverlay.SpotifyOverlay;
-import me.retucio.spotifyoverlay.hud.widgets.Button;
 import me.retucio.spotifyoverlay.hud.widgets.Overlay;
+import me.retucio.spotifyoverlay.hud.widgets.buttons.PauseOrResumeButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jspecify.annotations.Nullable;
@@ -10,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 
 public class Hud {
 
@@ -29,6 +29,7 @@ public class Hud {
 
     private void addWidgets() {
         widgets.add(overlay);
+        widgets.add(new PauseOrResumeButton());
     }
 
     public void render(GuiGraphicsExtractor gui, int mx, int my, float delta) {
@@ -46,7 +47,6 @@ public class Hud {
         for (Widget widget : widgets) {
             if (widget.isHovered(mx, my)) {
                 widget.onClick(mx, my, button, action);
-                select(widget);
                 break;
             }
         }

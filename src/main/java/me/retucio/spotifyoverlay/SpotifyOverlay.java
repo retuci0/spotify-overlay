@@ -8,11 +8,14 @@ import me.retucio.spotifyoverlay.hud.screen.AuthScreen;
 import me.retucio.spotifyoverlay.hud.screen.HudEditorScreen;
 import me.retucio.spotifyoverlay.spotify.SpotifyAuth;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
+import me.retucio.spotifyoverlay.util.KeyBinds;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -29,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class SpotifyOverlay implements ModInitializer {
 
 	public static final SpotifyOverlay INSTANCE = new SpotifyOverlay();
+
 	public static final Minecraft mc = Minecraft.getInstance();
 	private ScheduledExecutorService scheduler = null;
 
@@ -74,6 +78,10 @@ public class SpotifyOverlay implements ModInitializer {
 		mc.execute(() -> ConfigManager.INSTANCE.apply());
 	}
 
+	public void onTick() {
+
+	}
+
 	public void onShutdown() {
 		LOGGER.info("shutting down");
 		ConfigManager.INSTANCE.save();
@@ -98,16 +106,41 @@ public class SpotifyOverlay implements ModInitializer {
 		}
 	}
 
-
-
 	public void onKey(int key, int action) {
-		if (key == GLFW.GLFW_KEY_K && action == GLFW.GLFW_PRESS) {
-			mc.setScreen(HudEditorScreen.INSTANCE);
-		}
+		if (action == GLFW.GLFW_PRESS) handleKeybinds(key);
 	}
 
 	public void onClick(int button, int action) {
+		if (action == GLFW.GLFW_PRESS) handleKeybinds(button);
 		Hud.INSTANCE.onClick(button, action);
+	}
+
+	private void handleKeybinds(int input) {
+		for (KeyMapping bind : KeyBinds.spotifyKeys) {
+			if (bind.matches(new KeyEvent(input, 0, 0))) {
+				if (bind == KeyBinds.OPEN_CONTROL_PANEL) {
+					if (mc.screen == null) {
+						mc.setScreen(HudEditorScreen.INSTANCE);
+					}
+				} else if (bind == KeyBinds.PAUSE_OR_RESUME) {
+					SpotifyManager.INSTANCE.pauseOrResume();
+//				} else if (bind == KeyBinds.PREV_TRACK) {
+//					SpotifyManager.INSTANCE.prevTrack();
+//				} else if (bind == KeyBinds.NEXT_TRACK) {
+//					SpotifyManager.INSTANCE.nextTrack();
+//				} else if (bind == KeyBinds.FORWARD_5S) {
+//					SpotifyManager.INSTANCE.forward(5000);
+//				} else if (bind == KeyBinds.BACKWARD_5S) {
+//					SpotifyManager.INSTANCE.backward(5000);
+//				} else if (bind == KeyBinds.VOLUME_UP) {
+//					SpotifyManager.INSTANCE.increaseVolume();
+//				} else if (bind == KeyBinds.VOLUME_DOWN) {
+//					SpotifyManager.INSTANCE.decreaseVolume();
+//				} else if (bind == KeyBinds.TOGGLE_SHUFFLE) {
+//					SpotifyManager.INSTANCE.toggleShuffle();
+				}
+			}
+		}
 	}
 
 	public void onRender(GuiGraphicsExtractor gui, DeltaTracker dt) {

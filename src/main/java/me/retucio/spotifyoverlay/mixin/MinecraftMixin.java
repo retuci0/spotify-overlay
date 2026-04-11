@@ -18,6 +18,12 @@ public abstract class MinecraftMixin {
     @Shadow
     public abstract void setScreen(Screen screen);
 
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void onTick(CallbackInfo ci) {
+        SpotifyOverlay.INSTANCE.onTick();
+    }
+
     @Inject(method = "stop", at = @At("HEAD"))
     private void onShutdown(CallbackInfo ci) {
         SpotifyOverlay.INSTANCE.onShutdown();

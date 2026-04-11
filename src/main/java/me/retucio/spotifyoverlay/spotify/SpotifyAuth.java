@@ -13,7 +13,8 @@ import java.util.concurrent.CompletableFuture;
 public class SpotifyAuth {
 
     private static String codeVerifier;
-    private final static Minecraft mc = Minecraft.getInstance();
+
+    private static final String SCOPES = "user-read-currently-playing user-read-playback-state user-modify-playback-state";
 
     public static URI authLink = null;
     public static boolean shouldAuth = false;
@@ -28,7 +29,7 @@ public class SpotifyAuth {
 
             authLink = Config.getSpotifyApi()
                     .authorizationCodePKCEUri(codeChallenge)
-                    .scope("user-read-currently-playing user-read-playback-state")
+                    .scope(SCOPES)
                     .build()
                     .execute();
 

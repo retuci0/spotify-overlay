@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.List;
@@ -33,8 +34,17 @@ public abstract class Widget {
         this.dragging = false;
     }
 
-    protected abstract void onHover(int mx, int my);
-    protected abstract void onClick(int mx, int my, int button, int action);
+    protected void onHover(int mx, int my) {
+
+    }
+
+    protected void onClick(int mx, int my, int button, int action) {
+        if (action == GLFW.GLFW_PRESS) {
+            Hud.INSTANCE.select(this);
+        } else if (action == GLFW.GLFW_RELEASE) {
+            Hud.INSTANCE.select(null);
+        }
+    }
 
     public void render(GuiGraphicsExtractor gui, int mx, int my, float delta) {
         renderTooltip(gui, mx, my, delta);
