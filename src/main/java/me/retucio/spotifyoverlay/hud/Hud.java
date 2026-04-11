@@ -2,6 +2,8 @@ package me.retucio.spotifyoverlay.hud;
 
 import me.retucio.spotifyoverlay.hud.widgets.Overlay;
 import me.retucio.spotifyoverlay.hud.widgets.buttons.PauseOrResumeButton;
+import me.retucio.spotifyoverlay.hud.widgets.buttons.NextButton;
+import me.retucio.spotifyoverlay.hud.widgets.buttons.PrevButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jspecify.annotations.Nullable;
@@ -19,17 +21,17 @@ public class Hud {
     private int mx, my;
 
     private final List<Widget> widgets = new ArrayList<>();
-    private final Overlay overlay;
     private @Nullable Widget selected = null;
 
     public Hud() {
-        overlay = new Overlay(mc.getWindow().getGuiScaledWidth() - 202, 2, 200, 60);
         addWidgets();
     }
 
     private void addWidgets() {
-        widgets.add(overlay);
+        widgets.add(new Overlay());
         widgets.add(new PauseOrResumeButton());
+        widgets.add(new PrevButton());
+        widgets.add(new NextButton());
     }
 
     public void render(GuiGraphicsExtractor gui, int mx, int my, float delta) {
@@ -44,7 +46,7 @@ public class Hud {
     }
 
     public void onClick(int button, int action) {
-        for (Widget widget : widgets) {
+        for (Widget widget : widgets.reversed()) {
             if (widget.isHovered(mx, my)) {
                 widget.onClick(mx, my, button, action);
                 break;
@@ -53,7 +55,21 @@ public class Hud {
     }
 
     public Overlay getOverlay() {
-        return overlay;
+        for (Widget widget : widgets) {
+            if (widget instanceof Overlay overlay) {
+                return overlay;
+            }
+        }
+        return null;
+    }
+
+    public PauseOrResumeButton getPauseOrResumeButton() {
+        for (Widget widget : widgets) {
+            if (widget instanceof PauseOrResumeButton button) {
+                return button;
+            }
+        }
+        return null;
     }
 
     public boolean isSelected(Widget widget) {

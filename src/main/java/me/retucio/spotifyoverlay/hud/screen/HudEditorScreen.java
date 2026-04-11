@@ -15,7 +15,7 @@ public class HudEditorScreen extends Screen {
     public final static HudEditorScreen INSTANCE = new HudEditorScreen();
 
     protected HudEditorScreen() {
-        super(Component.nullToEmpty("hud editor"));
+        super(Component.nullToEmpty("control panel"));
     }
 
     @Override

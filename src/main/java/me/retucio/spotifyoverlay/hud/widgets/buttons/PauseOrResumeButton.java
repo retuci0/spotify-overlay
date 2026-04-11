@@ -2,7 +2,6 @@ package me.retucio.spotifyoverlay.hud.widgets.buttons;
 
 import me.retucio.spotifyoverlay.hud.widgets.Button;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
-import me.retucio.spotifyoverlay.util.ChatUtil;
 import me.retucio.spotifyoverlay.util.DrawUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -15,17 +14,16 @@ public class PauseOrResumeButton extends Button {
 
     private final int BG_COLOR = new Color(120, 120, 120, 180).getRGB();
 
+    public boolean paused = false;
+
     public PauseOrResumeButton() {
-        super("pause or resume", "pause or resume playback", 540, 360, 50, 50);
+        super("pause or resume", "pause or resume playback", 540, 540, 50, 50);
     }
 
     @Override
     public void renderOnHudEditor(GuiGraphicsExtractor gui, int mx, int my, float delta) {
-        int r = w / 2;
-        this.x = mc.getWindow().getGuiScaledWidth() / 2;
-        this.y = mc.getWindow().getGuiScaledHeight() * 3 / 4;
-        DrawUtil.drawCircle(gui, x, y, r, BG_COLOR);
-        if (!SpotifyManager.INSTANCE.isPlaying()) {
+        DrawUtil.drawCircle(gui, x, y, w / 2, BG_COLOR);
+        if (paused) {
             DrawUtil.drawTriangle(gui, x - 5, x - 5, x + 6, y - 6, y + 6, y, -1);
         } else {
             gui.fill(x - 7, y - 10, x - 3, y + 10, -1);
@@ -42,7 +40,12 @@ public class PauseOrResumeButton extends Button {
     @Override
     public void onClick(int mx, int my, int button, int action) {
         if (action == GLFW.GLFW_PRESS) {
-            SpotifyManager.INSTANCE.pauseOrResume();
+            paused = !paused;
+            if (!SpotifyManager.INSTANCE.pauseOrResume()) {
+                paused = !paused;  // revert
+            } else {
+                paused = SpotifyManager.INSTANCE.isPlaying();
+            }
         }
         super.onClick(mx, my, button, action);
     }
@@ -52,9 +55,9 @@ public class PauseOrResumeButton extends Button {
         if (!isHovered(mx, my)) return;
         gui.setTooltipForNextFrame(
                 Component.nullToEmpty(
-                        SpotifyManager.INSTANCE.isPlaying()
-                                ? "pause"
-                                : "resume"
+                        paused
+                                ? "resume"
+                                : "pause"
                 ),
                 mx, my
         );
@@ -66,5 +69,25 @@ public class PauseOrResumeButton extends Button {
         int dy = my - y;
         int r = w / 2;
         return dx * dx + dy * dy <= r * r;
+    }
+
+    @Override
+    public int defaultX() {
+        return mc.getWindow().getGuiScaledWidth() / 2;
+    }
+
+    @Override
+    public int defaultY() {
+        return mc.getWindow().getGuiScaledHeight() * 3 / 4;
+    }
+
+    @Override
+    public int defaultW() {
+        return 50;
+    }
+
+    @Override
+    public int defaultH() {
+        return 50;
     }
 }

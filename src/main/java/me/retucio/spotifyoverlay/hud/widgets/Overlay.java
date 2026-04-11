@@ -19,8 +19,9 @@ public class Overlay extends Widget {
     private final int WHITE = Color.WHITE.getRGB();
     private final int BG_COLOR = new Color(100, 100, 100, 80).getRGB();
 
-    public Overlay(int x, int y, int w, int h) {
-        super("overlay", "overlay that shows the currently playing track on spotify", x, y, w, h);
+    public Overlay() {
+        super("overlay", "overlay that shows the currently playing track on spotify",
+                878, 2, 200, 60);
     }
 
     @Override
@@ -96,5 +97,25 @@ public class Overlay extends Widget {
                 gui.fill(barX, barY, barX + filledWidth, barY + barHeight, WHITE);
             }
         }
+    }
+
+    @Override
+    public int defaultX() {
+        return mc.getWindow().getGuiScaledWidth() - 202;
+    }
+
+    @Override
+    public int defaultY() {
+        return 2;
+    }
+
+    @Override
+    public int defaultW() {
+        return 200;
+    }
+
+    @Override
+    public int defaultH() {
+        return 60;
     }
 }

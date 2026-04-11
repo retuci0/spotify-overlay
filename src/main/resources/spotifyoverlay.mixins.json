@@ -15,6 +15,7 @@
     "KeyboardHandlerMixin",
     "MinecraftMixin",
     "MouseHandlerMixin",
-    "OptionsMixin"
+    "OptionsMixin",
+    "WindowMixin"
   ]
 }

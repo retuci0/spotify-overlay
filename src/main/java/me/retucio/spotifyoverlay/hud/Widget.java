@@ -116,4 +116,9 @@ public abstract class Widget {
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
+
+    public abstract int defaultX();
+    public abstract int defaultY();
+    public abstract int defaultW();
+    public abstract int defaultH();
 }

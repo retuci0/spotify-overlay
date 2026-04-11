@@ -198,15 +198,15 @@ public class SpotifyManager {
 
     /* actions */
 
-    public void pauseOrResume() {
+    public boolean pauseOrResume() {
         if (isPlaying()) {
-            pause();
+            return pause();
         } else {
-            resume();
+            return resume();
         }
     }
 
-    public void pause() {
+    public boolean pause() {
         try {
             URL url = new URL("https://api.spotify.com/v1/me/player/pause");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -222,15 +222,20 @@ public class SpotifyManager {
 
             if (resCode == 204 || resCode == 200) {
                 ChatUtil.info("playback paused.");
+                return true;
+            } else if (resCode == 404) {
+                ChatUtil.error("no device is active!");
             } else {
                 SpotifyOverlay.LOGGER.error("couldn't pause playback: HTTP {}", resCode);
             }
         } catch (Exception e) {
             SpotifyOverlay.LOGGER.error("couldn't pause playback", e);
         }
+
+        return false;
     }
 
-    public void resume() {
+    public boolean resume() {
         try {
             URL url = new URL("https://api.spotify.com/v1/me/player/play");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -246,18 +251,71 @@ public class SpotifyManager {
 
             if (resCode == 204 || resCode == 200) {
                 ChatUtil.info("playback resumed.");
+                return true;
+            } else if (resCode == 404) {
+                ChatUtil.error("no device is active!");
             } else {
                 SpotifyOverlay.LOGGER.error("couldn't resume playback: HTTP {}", resCode);
             }
         } catch (Exception e) {
             SpotifyOverlay.LOGGER.error("couldn't resume playback", e);
         }
+
+        return false;
     }
 
     // todo: impl
 
-//    public void nextTrack();
-//    public void prevTrack();
+
+
+    public void prevTrack() {
+        try {
+            URL url = new URL("https://api.spotify.com/v1/me/player/previous");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write("{}".getBytes(StandardCharsets.UTF_8));
+            }
+
+            int resCode = conn.getResponseCode();
+
+            if (resCode == 204 || resCode == 200) {
+                ChatUtil.info("skipped to previous track.");
+            } else {
+                SpotifyOverlay.LOGGER.error("couldn't skip to previous track: HTTP {}", resCode);
+            }
+        } catch (Exception e) {
+            SpotifyOverlay.LOGGER.error("couldn't skip to previous track", e);
+        }
+    }
+
+    public void nextTrack() {
+        try {
+            URL url = new URL("https://api.spotify.com/v1/me/player/next");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write("{}".getBytes(StandardCharsets.UTF_8));
+            }
+
+            int resCode = conn.getResponseCode();
+
+            if (resCode == 204 || resCode == 200) {
+                ChatUtil.info("skipped to next track.");
+            } else {
+                SpotifyOverlay.LOGGER.error("couldn't skip to next track: HTTP {}", resCode);
+            }
+        } catch (Exception e) {
+            SpotifyOverlay.LOGGER.error("couldn't skip to next track", e);
+        }
+    }
+
 //
 //    public void forward(int ms);
 //
