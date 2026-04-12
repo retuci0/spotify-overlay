@@ -316,15 +316,41 @@ public class SpotifyManager {
         }
     }
 
+    public void setVolume(int percent) {
+        if (percent < 0 || percent > 100) {
+            SpotifyOverlay.LOGGER.error("illegal volume percentage: {}%", percent);
+            return;
+        }
+
+        try {
+            URL url = new URL("https://api.spotify.com/v1/me/player/volume?volume_percent=" + percent);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("PUT");
+            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write("{}".getBytes(StandardCharsets.UTF_8));
+            }
+
+            int resCode = conn.getResponseCode();
+
+            if (resCode == 204 || resCode == 200) {
+                SpotifyOverlay.LOGGER.info("set volume to {}%", percent);
+            } else {
+                SpotifyOverlay.LOGGER.error("couldn't change volume: HTTP {}", resCode);
+            }
+        } catch (Exception e) {
+            SpotifyOverlay.LOGGER.error("couldn't change volume", e);
+        }
+    }
+
 //
 //    public void forward(int ms);
 //
 //    public void backward(int ms) {
 //        forward(-ms);
 //    }
-//
-//    public void increaseVolume();
-//    public void decreaseVolume();
 //
 //    public void toggleShuffle();
 

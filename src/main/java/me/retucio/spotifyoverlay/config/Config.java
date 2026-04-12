@@ -14,6 +14,8 @@ public class Config implements Serializable {
     public int x = 0, y = 0;
     public float scale = 1.0f;
 
+    public int volume = 80;
+
     public static SpotifyApi spotifyApi = null;
 
     public static SpotifyApi getSpotifyApi() {

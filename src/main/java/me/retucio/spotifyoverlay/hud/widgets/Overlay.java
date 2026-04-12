@@ -6,6 +6,7 @@ import me.retucio.spotifyoverlay.config.ConfigManager;
 import me.retucio.spotifyoverlay.hud.Widget;
 import me.retucio.spotifyoverlay.spotify.Song;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
+import me.retucio.spotifyoverlay.util.KeyUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.FormattedText;
@@ -22,21 +23,6 @@ public class Overlay extends Widget {
     public Overlay() {
         super("overlay", "overlay that shows the currently playing track on spotify",
                 878, 2, 200, 60);
-    }
-
-    @Override
-    protected void onClick(int mx, int my, int button, int action) {
-        if (action == GLFW.GLFW_PRESS) {
-            dragging = true;
-            dx = mx - x;
-            dy = my - y;
-        } else if (action == GLFW.GLFW_RELEASE) {
-            dragging = false;
-            ConfigManager.INSTANCE.getConfig().x = this.x;
-            ConfigManager.INSTANCE.getConfig().y = this.y;
-        }
-
-        super.onClick(mx, my, button, action);
     }
 
     @Override
@@ -72,14 +58,20 @@ public class Overlay extends Widget {
         String title = current.isEmpty() ? "no song playing :(" : current.name();
         int titleWidth = mc.font.width(title);
         if (titleWidth > textWidth) {
-            title = mc.font.substrByWidth(FormattedText.of(title), textWidth - 8).getString() + "...";
+            title = mc.font.substrByWidth(FormattedText.of(title), textWidth - 8)
+                    .getString() + "...";
         }
         int titleY = y + (h / 3) - mc.font.lineHeight / 2;
         gui.text(mc.font, title, textX, titleY, WHITE, true);
 
         String artistsText = current.isEmpty() ? "" : String.join(", ", current.artists());
+        int artistsWidth = mc.font.width(artistsText);
+        if (artistsWidth > textWidth) {
+            artistsText = mc.font.substrByWidth(FormattedText.of(artistsText), textWidth - 8)
+                    .getString() + "...";
+        }
         if (!artistsText.isEmpty()) {
-            int artistsY = titleY + mc.font.lineHeight + 2;
+            int artistsY = titleY + mc.font.lineHeight + PADDING;
             gui.text(mc.font, artistsText, textX, artistsY, WHITE, false);
         }
 
@@ -97,6 +89,38 @@ public class Overlay extends Widget {
                 gui.fill(barX, barY, barX + filledWidth, barY + barHeight, WHITE);
             }
         }
+    }
+
+    @Override
+    protected void onClick(int mx, int my, int button, int action) {
+        if (action == GLFW.GLFW_PRESS) {
+            if (button == 0) {
+                dragging = true;
+                dx = mx - x;
+                dy = my - y;
+            } else if (button == 1 && KeyUtil.isShiftDown()) {
+                this.x = defaultX();
+                this.y = defaultY();
+            }
+        } else if (action == GLFW.GLFW_RELEASE) {
+            dragging = false;
+            ConfigManager.INSTANCE.getConfig().x = this.x;
+            ConfigManager.INSTANCE.getConfig().y = this.y;
+        }
+
+        super.onClick(mx, my, button, action);
+    }
+
+    @Override
+    public void onKey(int key, int action) {
+        if (action == GLFW.GLFW_RELEASE) return;
+        switch (key) {
+            case GLFW.GLFW_KEY_UP       -> y -= PADDING;
+            case GLFW.GLFW_KEY_DOWN     -> y += PADDING;
+            case GLFW.GLFW_KEY_LEFT     -> x -= PADDING;
+            case GLFW.GLFW_KEY_RIGHT    -> x += PADDING;
+        }
+        super.onKey(key, action);
     }
 
     @Override

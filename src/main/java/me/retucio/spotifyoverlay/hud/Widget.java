@@ -34,15 +34,21 @@ public abstract class Widget {
         this.dragging = false;
     }
 
+    protected void onMouseMove(int mx, int my) {
+
+    }
+
     protected void onHover(int mx, int my) {
+
+    }
+
+    protected void onKey(int key, int action) {
 
     }
 
     protected void onClick(int mx, int my, int button, int action) {
         if (action == GLFW.GLFW_PRESS) {
             Hud.INSTANCE.select(this);
-        } else if (action == GLFW.GLFW_RELEASE) {
-            Hud.INSTANCE.select(null);
         }
     }
 

@@ -63,6 +63,8 @@ public class ConfigManager {
         overlay.setX(config.x);
         overlay.setY(config.y);
 
+        Hud.INSTANCE.getVolumeSlider().setValue(config.volume);
+
         loaded = true;
         SpotifyOverlay.LOGGER.info("settings applied");
     }

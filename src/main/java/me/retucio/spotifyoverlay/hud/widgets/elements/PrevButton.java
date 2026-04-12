@@ -1,4 +1,4 @@
-package me.retucio.spotifyoverlay.hud.widgets.buttons;
+package me.retucio.spotifyoverlay.hud.widgets.elements;
 
 import me.retucio.spotifyoverlay.hud.Hud;
 import me.retucio.spotifyoverlay.hud.widgets.Button;
@@ -6,8 +6,6 @@ import me.retucio.spotifyoverlay.spotify.SpotifyManager;
 import me.retucio.spotifyoverlay.util.DrawUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.lwjgl.glfw.GLFW;
-
-import java.awt.*;
 
 public class PrevButton extends Button {
 

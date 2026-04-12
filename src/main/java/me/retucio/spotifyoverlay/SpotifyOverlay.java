@@ -107,6 +107,7 @@ public class SpotifyOverlay implements ModInitializer {
 	}
 
 	public void onKey(int key, int action) {
+		Hud.INSTANCE.onKey(key, action);
 		if (action == GLFW.GLFW_PRESS) handleKeybinds(key);
 	}
 
@@ -124,10 +125,10 @@ public class SpotifyOverlay implements ModInitializer {
 					}
 				} else if (bind == KeyBinds.PAUSE_OR_RESUME) {
 					SpotifyManager.INSTANCE.pauseOrResume();
-//				} else if (bind == KeyBinds.PREV_TRACK) {
-//					SpotifyManager.INSTANCE.prevTrack();
-//				} else if (bind == KeyBinds.NEXT_TRACK) {
-//					SpotifyManager.INSTANCE.nextTrack();
+				} else if (bind == KeyBinds.PREV_TRACK) {
+					SpotifyManager.INSTANCE.prevTrack();
+				} else if (bind == KeyBinds.NEXT_TRACK) {
+					SpotifyManager.INSTANCE.nextTrack();
 //				} else if (bind == KeyBinds.FORWARD_5S) {
 //					SpotifyManager.INSTANCE.forward(5000);
 //				} else if (bind == KeyBinds.BACKWARD_5S) {

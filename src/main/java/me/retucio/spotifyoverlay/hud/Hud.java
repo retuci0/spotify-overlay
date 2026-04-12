@@ -1,12 +1,15 @@
 package me.retucio.spotifyoverlay.hud;
 
+import me.retucio.spotifyoverlay.hud.screen.HudEditorScreen;
 import me.retucio.spotifyoverlay.hud.widgets.Overlay;
-import me.retucio.spotifyoverlay.hud.widgets.buttons.PauseOrResumeButton;
-import me.retucio.spotifyoverlay.hud.widgets.buttons.NextButton;
-import me.retucio.spotifyoverlay.hud.widgets.buttons.PrevButton;
+import me.retucio.spotifyoverlay.hud.widgets.elements.PauseOrResumeButton;
+import me.retucio.spotifyoverlay.hud.widgets.elements.NextButton;
+import me.retucio.spotifyoverlay.hud.widgets.elements.PrevButton;
+import me.retucio.spotifyoverlay.hud.widgets.elements.VolumeSlider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jspecify.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,12 +35,10 @@ public class Hud {
         widgets.add(new PauseOrResumeButton());
         widgets.add(new PrevButton());
         widgets.add(new NextButton());
+        widgets.add(new VolumeSlider());
     }
 
     public void render(GuiGraphicsExtractor gui, int mx, int my, float delta) {
-        this.mx = mx;
-        this.my = my;
-
         for (Widget widget : widgets) {
             if (widget.isVisible()) {
                 widget.render(gui, mx, my, delta);
@@ -46,12 +47,26 @@ public class Hud {
     }
 
     public void onClick(int button, int action) {
+        if (!(mc.screen instanceof HudEditorScreen)) return;
+        if (action == GLFW.GLFW_RELEASE && button == 0) select(null);
         for (Widget widget : widgets.reversed()) {
             if (widget.isHovered(mx, my)) {
                 widget.onClick(mx, my, button, action);
                 break;
             }
         }
+    }
+
+    public void onKey(int key, int action) {
+        if (!(mc.screen instanceof HudEditorScreen)) return;
+        if (selected != null) selected.onKey(key, action);
+    }
+
+    public void onMouseMove(int mx, int my) {
+        if (!(mc.screen instanceof HudEditorScreen)) return;
+        if (selected != null) selected.onMouseMove(mx, my);
+        this.mx = mx;
+        this.my = my;
     }
 
     public Overlay getOverlay() {
@@ -70,6 +85,15 @@ public class Hud {
             }
         }
         return null;
+    }
+
+    public VolumeSlider getVolumeSlider() {
+            for (Widget widget : widgets) {
+                if (widget instanceof VolumeSlider slider) {
+                    return slider;
+                }
+            }
+            return null;
     }
 
     public boolean isSelected(Widget widget) {
