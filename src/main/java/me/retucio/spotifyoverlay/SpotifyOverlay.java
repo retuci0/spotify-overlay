@@ -62,6 +62,9 @@ public class SpotifyOverlay implements ModInitializer {
 						screen.onClose();
 					}
 
+					// set volume to stored value
+					SpotifyManager.INSTANCE.setVolume(ConfigManager.INSTANCE.getConfig().volume);
+
 					startPolling();
 				} catch (Exception e) {
 					LOGGER.error("failed to connect to Spotify", e);
@@ -96,8 +99,8 @@ public class SpotifyOverlay implements ModInitializer {
 		scheduler = Executors.newSingleThreadScheduledExecutor();
 		scheduler.scheduleAtFixedRate(
 				SpotifyManager.INSTANCE::updatePlaybackState,
-				0, 2, TimeUnit.SECONDS
-		);  // every 2 seconds
+				0, 1, TimeUnit.SECONDS
+		);  // every second
 	}
 
 	public void stopPolling() {

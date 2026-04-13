@@ -13,6 +13,7 @@ public class Config implements Serializable {
 
     public int x = 0, y = 0;
     public float scale = 1.0f;
+    public boolean visible = true;
 
     public int volume = 80;
 

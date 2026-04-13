@@ -1,4 +1,4 @@
-package me.retucio.spotifyoverlay.hud.widgets.elements;
+package me.retucio.spotifyoverlay.hud.widgets.buttons;
 
 import me.retucio.spotifyoverlay.hud.Hud;
 import me.retucio.spotifyoverlay.hud.widgets.Button;

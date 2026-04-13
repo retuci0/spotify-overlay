@@ -1,4 +1,4 @@
-package me.retucio.spotifyoverlay.hud.widgets.elements;
+package me.retucio.spotifyoverlay.hud.widgets.buttons;
 
 import me.retucio.spotifyoverlay.hud.widgets.Button;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
@@ -12,7 +12,7 @@ import java.awt.*;
 
 public class PauseOrResumeButton extends Button {
 
-    private final int BG_COLOR = new Color(120, 120, 120, 180).getRGB();
+    private final Color BG_COLOR = new Color(120, 120, 120, 180);
 
     public boolean paused = false;
 
@@ -22,7 +22,7 @@ public class PauseOrResumeButton extends Button {
 
     @Override
     public void renderOnHudEditor(GuiGraphicsExtractor gui, int mx, int my, float delta) {
-        DrawUtil.drawCircle(gui, x, y, w / 2, BG_COLOR);
+        DrawUtil.drawCircle(gui, x, y, w / 2, isHovered(mx, my) ? BG_COLOR.brighter().getRGB() : BG_COLOR.getRGB());
         if (paused) {
             DrawUtil.drawTriangle(gui, x - 5, x - 5, x + 6, y - 6, y + 6, y, -1);
         } else {

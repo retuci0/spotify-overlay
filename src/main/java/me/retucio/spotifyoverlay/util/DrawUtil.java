@@ -67,4 +67,11 @@ public class DrawUtil {
             gui.fill((int) xl, y, (int) xr + 1, y + 1, color);
         }
     }
+
+    public static void drawRectOutline(GuiGraphicsExtractor gui, int x, int y, int w, int h, int border, int color) {
+        gui.fill(x, y, x + w, y + border, color);
+        gui.fill(x, y + h - border, x + w, y + h, color);
+        gui.fill(x, y + border, x + border, y + h - border, color);
+        gui.fill(x + w - border, y + border, x + w, y + h - border, color);
+    }
 }

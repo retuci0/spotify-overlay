@@ -7,12 +7,15 @@ import me.retucio.spotifyoverlay.config.Config;
 import me.retucio.spotifyoverlay.config.ConfigManager;
 import me.retucio.spotifyoverlay.util.ChatUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.resources.Identifier;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -55,7 +58,7 @@ public class SpotifyManager {
             if (resCode == 401) {
                 SpotifyOverlay.LOGGER.info("token expired, attempting refresh...");
                 if (refreshToken()) {
-                    updatePlaybackState(); // retry after refresh
+                    updatePlaybackState();  // retry after refresh
                 }
                 return;
             }
@@ -70,6 +73,10 @@ public class SpotifyManager {
 
             // no song playing
             if (resCode == 204) {
+                if (currentCover != null) {
+                    currentCover.close();
+                    currentCover = null;
+                }
                 currentSong = Song.empty();
                 currentProgress = -1;
                 isPlaying = false;
@@ -140,9 +147,10 @@ public class SpotifyManager {
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(5000);
 
-            int responseCode = conn.getResponseCode();
-            if (responseCode != 200) {
-                SpotifyOverlay.LOGGER.error("failed to fetch cover: HTTP {}", responseCode);
+            int resCode = conn.getResponseCode();
+
+            if (resCode != 200) {
+                SpotifyOverlay.LOGGER.error("failed to fetch cover: HTTP {}", resCode);
             }
 
             BufferedImage bufferedImage = ImageIO.read(conn.getInputStream());
@@ -162,11 +170,20 @@ public class SpotifyManager {
                 }
             }
 
-            currentCover = nativeImage;
-            mc.execute(() -> mc.getTextureManager().register(Identifier.fromNamespaceAndPath(SpotifyOverlay.MOD_ID, "cover"),
-                    new DynamicTexture(() -> "cover", currentCover)));
+            // call from main thread
+            mc.execute(() -> {
+                if (currentCover != null) currentCover.close();
+                currentCover = nativeImage;
+
+                Identifier id = Identifier.fromNamespaceAndPath(SpotifyOverlay.MOD_ID, "albumcover");
+                AbstractTexture oldTexture = mc.getTextureManager().getTexture(id);
+                if (oldTexture != null) oldTexture.close();
+
+                mc.getTextureManager().register(id, new DynamicTexture(() -> "albumcover", currentCover));
+            });
         } catch (Exception e) {
             SpotifyOverlay.LOGGER.error("couldn't fetch album cover", e);
+            e.printStackTrace();
         } finally {
             if (conn != null) conn.disconnect();
         }
@@ -208,18 +225,10 @@ public class SpotifyManager {
 
     public boolean pause() {
         try {
-            URL url = new URL("https://api.spotify.com/v1/me/player/pause");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("PUT");
-            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
-            conn.setDoOutput(true);
-
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write("{}".getBytes(StandardCharsets.UTF_8));
-            }
+            HttpURLConnection conn = getConnection("https://api.spotify.com/v1/me/player/pause", "PUT");
+            writeEmptyBody(conn);
 
             int resCode = conn.getResponseCode();
-
             if (resCode == 204 || resCode == 200) {
                 ChatUtil.info("playback paused.");
                 return true;
@@ -237,18 +246,10 @@ public class SpotifyManager {
 
     public boolean resume() {
         try {
-            URL url = new URL("https://api.spotify.com/v1/me/player/play");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("PUT");
-            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
-            conn.setDoOutput(true);
-
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write("{}".getBytes(StandardCharsets.UTF_8));
-            }
+            HttpURLConnection conn = getConnection("https://api.spotify.com/v1/me/player/play", "PUT");
+            writeEmptyBody(conn);
 
             int resCode = conn.getResponseCode();
-
             if (resCode == 204 || resCode == 200) {
                 ChatUtil.info("playback resumed.");
                 return true;
@@ -270,18 +271,10 @@ public class SpotifyManager {
 
     public void prevTrack() {
         try {
-            URL url = new URL("https://api.spotify.com/v1/me/player/previous");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
-            conn.setDoOutput(true);
-
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write("{}".getBytes(StandardCharsets.UTF_8));
-            }
+            HttpURLConnection conn = getConnection("https://api.spotify.com/v1/me/player/previous", "POST");
+            writeEmptyBody(conn);
 
             int resCode = conn.getResponseCode();
-
             if (resCode == 204 || resCode == 200) {
                 ChatUtil.info("skipped to previous track.");
             } else {
@@ -294,18 +287,10 @@ public class SpotifyManager {
 
     public void nextTrack() {
         try {
-            URL url = new URL("https://api.spotify.com/v1/me/player/next");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
-            conn.setDoOutput(true);
-
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write("{}".getBytes(StandardCharsets.UTF_8));
-            }
+            HttpURLConnection conn = getConnection("https://api.spotify.com/v1/me/player/next", "POST");
+            writeEmptyBody(conn);
 
             int resCode = conn.getResponseCode();
-
             if (resCode == 204 || resCode == 200) {
                 ChatUtil.info("skipped to next track.");
             } else {
@@ -323,18 +308,10 @@ public class SpotifyManager {
         }
 
         try {
-            URL url = new URL("https://api.spotify.com/v1/me/player/volume?volume_percent=" + percent);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("PUT");
-            conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
-            conn.setDoOutput(true);
-
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write("{}".getBytes(StandardCharsets.UTF_8));
-            }
+            HttpURLConnection conn = getConnection("https://api.spotify.com/v1/me/player/volume?volume_percent=" + percent, "PUT");
+            writeEmptyBody(conn);
 
             int resCode = conn.getResponseCode();
-
             if (resCode == 204 || resCode == 200) {
                 SpotifyOverlay.LOGGER.info("set volume to {}%", percent);
             } else {
@@ -345,7 +322,7 @@ public class SpotifyManager {
         }
     }
 
-//
+//    todo: impl
 //    public void forward(int ms);
 //
 //    public void backward(int ms) {
@@ -375,5 +352,21 @@ public class SpotifyManager {
 
     public Config getConfig() {
         return ConfigManager.INSTANCE.getConfig();
+    }
+
+    @SuppressWarnings("deprecation")
+    public HttpURLConnection getConnection(String url, String method) throws IOException {
+        URL url1 = new URL(url);
+        HttpURLConnection conn = (HttpURLConnection) url1.openConnection();
+        conn.setRequestMethod(method);
+        conn.setRequestProperty("Authorization", "Bearer " + getConfig().accessToken);
+        conn.setDoOutput(true);
+        return conn;
+    }
+
+    public void writeEmptyBody(HttpURLConnection conn) throws IOException {
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write("{}".getBytes(StandardCharsets.UTF_8));
+        }
     }
 }

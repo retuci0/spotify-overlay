@@ -2,10 +2,8 @@ package me.retucio.spotifyoverlay.hud;
 
 import me.retucio.spotifyoverlay.hud.screen.HudEditorScreen;
 import me.retucio.spotifyoverlay.hud.widgets.Overlay;
-import me.retucio.spotifyoverlay.hud.widgets.elements.PauseOrResumeButton;
-import me.retucio.spotifyoverlay.hud.widgets.elements.NextButton;
-import me.retucio.spotifyoverlay.hud.widgets.elements.PrevButton;
-import me.retucio.spotifyoverlay.hud.widgets.elements.VolumeSlider;
+import me.retucio.spotifyoverlay.hud.widgets.buttons.*;
+import me.retucio.spotifyoverlay.hud.widgets.sliders.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jspecify.annotations.Nullable;
@@ -31,11 +29,12 @@ public class Hud {
     }
 
     private void addWidgets() {
-        widgets.add(new Overlay());
         widgets.add(new PauseOrResumeButton());
         widgets.add(new PrevButton());
         widgets.add(new NextButton());
         widgets.add(new VolumeSlider());
+        widgets.add(new ProgressSlider());
+        widgets.add(new Overlay());
     }
 
     public void render(GuiGraphicsExtractor gui, int mx, int my, float delta) {
@@ -48,11 +47,12 @@ public class Hud {
 
     public void onClick(int button, int action) {
         if (!(mc.screen instanceof HudEditorScreen)) return;
-        if (action == GLFW.GLFW_RELEASE && button == 0) select(null);
         for (Widget widget : widgets.reversed()) {
             if (widget.isHovered(mx, my)) {
                 widget.onClick(mx, my, button, action);
                 break;
+            } else if (action == GLFW.GLFW_PRESS){
+                select(null);
             }
         }
     }

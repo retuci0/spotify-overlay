@@ -1,5 +1,7 @@
 package me.retucio.spotifyoverlay.hud;
 
+import me.retucio.spotifyoverlay.util.DrawUtil;
+import me.retucio.spotifyoverlay.util.KeyUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -47,8 +49,14 @@ public abstract class Widget {
     }
 
     protected void onClick(int mx, int my, int button, int action) {
-        if (action == GLFW.GLFW_PRESS) {
-            Hud.INSTANCE.select(this);
+        if (action != GLFW.GLFW_PRESS) return;
+        if (button == 0) Hud.INSTANCE.select(this);
+        else if (button == 1) {
+            if (KeyUtil.isShiftDown()) {
+                resetPosition();
+            } else {
+                visible = !visible;
+            }
         }
     }
 
@@ -57,11 +65,12 @@ public abstract class Widget {
     }
 
     public void renderOnHudEditor(GuiGraphicsExtractor gui, int mx, int my, float delta) {
-        int outlineColor;
-        if (Hud.INSTANCE.isSelected(this)) outlineColor = Color.GREEN.getRGB();
-        else outlineColor = Color.RED.darker().getRGB();
+        int outlineColor, bgColor;
+        outlineColor = Hud.INSTANCE.isSelected(this) ? Color.GREEN.getRGB() : Color.RED.darker().getRGB();
+        bgColor = this.visible ? Color.GREEN.getRGB() : Color.RED.darker().getRGB();
 
-        gui.fill(x - PADDING, y - PADDING, x + w + PADDING, y + h + PADDING, outlineColor);
+        gui.fill(x, y , x + w , y + h, bgColor);
+        DrawUtil.drawRectOutline(gui, x - PADDING, y - PADDING, w + PADDING, h + PADDING, PADDING, outlineColor);
         render(gui, mx, my, delta);
     }
 
@@ -79,8 +88,12 @@ public abstract class Widget {
 
     public boolean isHovered(int mx, int my) {
         return mx >= x && mx <= x + w
-            && my >= y && my <= y + h
-            && visible;
+            && my >= y && my <= y + h;
+    }
+
+    void resetPosition() {
+        x = defaultX();
+        y = defaultY();
     }
 
     public int getX() {

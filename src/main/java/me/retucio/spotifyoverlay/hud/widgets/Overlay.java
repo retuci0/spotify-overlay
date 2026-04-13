@@ -47,7 +47,7 @@ public class Overlay extends Widget {
             gui.blit(RenderPipelines.GUI_TEXTURED,
                     Identifier.fromNamespaceAndPath(
                             SpotifyOverlay.MOD_ID,
-                            "cover"
+                            "albumcover"
                     ), cx, cy, cs, cs, cs, cs, cs, cs
             );
         }
@@ -98,15 +98,14 @@ public class Overlay extends Widget {
                 dragging = true;
                 dx = mx - x;
                 dy = my - y;
-            } else if (button == 1 && KeyUtil.isShiftDown()) {
-                this.x = defaultX();
-                this.y = defaultY();
             }
         } else if (action == GLFW.GLFW_RELEASE) {
             dragging = false;
             ConfigManager.INSTANCE.getConfig().x = this.x;
             ConfigManager.INSTANCE.getConfig().y = this.y;
         }
+
+        ConfigManager.INSTANCE.getConfig().visible = this.visible;
 
         super.onClick(mx, my, button, action);
     }
