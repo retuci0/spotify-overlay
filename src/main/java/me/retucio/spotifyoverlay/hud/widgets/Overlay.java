@@ -22,7 +22,7 @@ public class Overlay extends Widget {
 
     public Overlay() {
         super("overlay", "overlay that shows the currently playing track on spotify",
-                878, 2, 200, 60);
+                758, 2, 200, 60);
     }
 
     @Override

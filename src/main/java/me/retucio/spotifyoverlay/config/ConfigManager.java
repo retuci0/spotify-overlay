@@ -62,6 +62,8 @@ public class ConfigManager {
         Overlay overlay = Hud.INSTANCE.getOverlay();
         overlay.setX(config.x);
         overlay.setY(config.y);
+        overlay.setW(config.w);
+        overlay.setH(config.h);
         overlay.setVisible(config.visible);
 
         Hud.INSTANCE.getVolumeSlider().setValue(config.volume);

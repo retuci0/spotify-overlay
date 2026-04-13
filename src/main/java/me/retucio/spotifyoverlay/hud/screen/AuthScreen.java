@@ -5,6 +5,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 
 import java.net.URI;
@@ -64,5 +65,10 @@ public class AuthScreen extends Screen {
     @Override
     public boolean canInterruptWithAnotherScreen() {
         return true;
+    }
+
+    @Override
+    public void onClose() {
+        mc.execute(() -> mc.setScreen(new TitleScreen()));
     }
 }
