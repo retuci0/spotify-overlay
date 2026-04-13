@@ -5,6 +5,7 @@ import me.retucio.spotifyoverlay.spotify.SpotifyManager;
 import me.retucio.spotifyoverlay.util.DrawUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class ProgressSlider extends Slider {
     }
 
     @Override
-    public void renderOnHudEditor(GuiGraphicsExtractor gui, int mx, int my, float delta) {
+    public void renderOnControlPanel(GuiGraphicsExtractor gui, int mx, int my, float delta) {
         super.render(gui, mx, my, delta);
 
         String progress = getTimestamp(value);
@@ -47,13 +48,13 @@ public class ProgressSlider extends Slider {
         if (isHovered(mx, my)) {
             gui.fill(mx, y, mx + 1, y + h, -1);
         }
+
+        if (!dragging) value = SpotifyManager.INSTANCE.getCurrentProgress() / 1000.0f;
+        max = SpotifyManager.INSTANCE.getCurrentSong().duration() / 1000.0f;
     }
 
     @Override
     public void render(GuiGraphicsExtractor gui, int mx, int my, float delta) {
-        value = SpotifyManager.INSTANCE.getCurrentProgress() / 1000.0f;
-        max = SpotifyManager.INSTANCE.getCurrentSong().duration() / 1000.0f;
-
         // (draw on control panel only)
     }
 
@@ -76,6 +77,13 @@ public class ProgressSlider extends Slider {
         );
     }
 
+    @Override
+    public void onClick(int mx, int my, int button, int action) {
+        super.onClick(mx, my, button, action);
+        if (action == GLFW.GLFW_RELEASE && button == 0) {
+            SpotifyManager.INSTANCE.seekTo((int) value * 1000);
+        }
+    }
     private String getTimestamp(float value) {
         int mins = (int) value / 60;
         int secs = (int) value % 60;  // haha secs

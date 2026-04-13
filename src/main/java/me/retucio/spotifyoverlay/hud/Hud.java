@@ -1,6 +1,6 @@
 package me.retucio.spotifyoverlay.hud;
 
-import me.retucio.spotifyoverlay.hud.screen.HudEditorScreen;
+import me.retucio.spotifyoverlay.hud.screen.ControlPanelScreen;
 import me.retucio.spotifyoverlay.hud.widgets.Overlay;
 import me.retucio.spotifyoverlay.hud.widgets.buttons.*;
 import me.retucio.spotifyoverlay.hud.widgets.sliders.*;
@@ -46,7 +46,7 @@ public class Hud {
     }
 
     public void onClick(int button, int action) {
-        if (!(mc.screen instanceof HudEditorScreen)) return;
+        if (!(mc.screen instanceof ControlPanelScreen)) return;
         for (Widget widget : widgets.reversed()) {
             if (widget.isHovered(mx, my)) {
                 widget.onClick(mx, my, button, action);
@@ -58,12 +58,12 @@ public class Hud {
     }
 
     public void onKey(int key, int action) {
-        if (!(mc.screen instanceof HudEditorScreen)) return;
+        if (!(mc.screen instanceof ControlPanelScreen)) return;
         if (selected != null) selected.onKey(key, action);
     }
 
     public void onMouseMove(int mx, int my) {
-        if (!(mc.screen instanceof HudEditorScreen)) return;
+        if (!(mc.screen instanceof ControlPanelScreen)) return;
         if (selected != null) selected.onMouseMove(mx, my);
         this.mx = mx;
         this.my = my;

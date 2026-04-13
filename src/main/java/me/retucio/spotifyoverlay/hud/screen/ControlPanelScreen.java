@@ -10,11 +10,11 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Iterator;
 
-public class HudEditorScreen extends Screen {
+public class ControlPanelScreen extends Screen {
 
-    public final static HudEditorScreen INSTANCE = new HudEditorScreen();
+    public final static ControlPanelScreen INSTANCE = new ControlPanelScreen();
 
-    protected HudEditorScreen() {
+    protected ControlPanelScreen() {
         super(Component.nullToEmpty("control panel"));
     }
 
@@ -23,7 +23,7 @@ public class HudEditorScreen extends Screen {
         Iterator<Widget> it = Hud.INSTANCE.getWigets();
         while (it.hasNext()) {
             Widget widget = it.next();
-            widget.renderOnHudEditor(gui, mouseX, mouseY, delta);
+            widget.renderOnControlPanel(gui, mouseX, mouseY, delta);
         }
         super.extractRenderState(gui, mouseX, mouseY, delta);
     }

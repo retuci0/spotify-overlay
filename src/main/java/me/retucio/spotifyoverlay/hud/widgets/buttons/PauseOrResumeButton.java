@@ -21,7 +21,7 @@ public class PauseOrResumeButton extends Button {
     }
 
     @Override
-    public void renderOnHudEditor(GuiGraphicsExtractor gui, int mx, int my, float delta) {
+    public void renderOnControlPanel(GuiGraphicsExtractor gui, int mx, int my, float delta) {
         DrawUtil.drawCircle(gui, x, y, w / 2, isHovered(mx, my) ? BG_COLOR.brighter().getRGB() : BG_COLOR.getRGB());
         if (paused) {
             DrawUtil.drawTriangle(gui, x - 5, x - 5, x + 6, y - 6, y + 6, y, -1);

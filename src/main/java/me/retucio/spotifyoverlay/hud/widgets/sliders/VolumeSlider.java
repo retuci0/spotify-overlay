@@ -26,7 +26,7 @@ public class VolumeSlider extends Slider {
     }
 
     @Override
-    public void renderOnHudEditor(GuiGraphicsExtractor gui, int mx, int my, float delta) {
+    public void renderOnControlPanel(GuiGraphicsExtractor gui, int mx, int my, float delta) {
         String text = (int) value + "%";
         gui.text(mc.font, text, x + w / 2 - mc.font.width(text) / 2, y - 2 * mc.font.lineHeight, -1, true);
         super.render(gui, mx, my, delta);

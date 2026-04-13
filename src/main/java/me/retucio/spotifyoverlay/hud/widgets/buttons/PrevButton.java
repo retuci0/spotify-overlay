@@ -14,7 +14,7 @@ public class PrevButton extends Button {
     }
 
     @Override
-    public void renderOnHudEditor(GuiGraphicsExtractor gui, int mx, int my, float delta) {
+    public void renderOnControlPanel(GuiGraphicsExtractor gui, int mx, int my, float delta) {
         gui.fill(x, y, x + 5, y + h, -1);
         DrawUtil.drawTriangle(gui, x + 5, x + w, x + w, y + h / 2, y, y + h, -1);
         super.render(gui, mx, my, delta);

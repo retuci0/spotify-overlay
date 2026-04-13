@@ -5,7 +5,7 @@ import me.retucio.spotifyoverlay.config.Config;
 import me.retucio.spotifyoverlay.config.ConfigManager;
 import me.retucio.spotifyoverlay.hud.Hud;
 import me.retucio.spotifyoverlay.hud.screen.AuthScreen;
-import me.retucio.spotifyoverlay.hud.screen.HudEditorScreen;
+import me.retucio.spotifyoverlay.hud.screen.ControlPanelScreen;
 import me.retucio.spotifyoverlay.spotify.SpotifyAuth;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
 import me.retucio.spotifyoverlay.util.KeyBinds;
@@ -124,7 +124,7 @@ public class SpotifyOverlay implements ModInitializer {
 			if (bind.matches(new KeyEvent(input, 0, 0))) {
 				if (bind == KeyBinds.OPEN_CONTROL_PANEL) {
 					if (mc.screen == null) {
-						mc.setScreen(HudEditorScreen.INSTANCE);
+						mc.setScreen(ControlPanelScreen.INSTANCE);
 					}
 				} else if (bind == KeyBinds.PAUSE_OR_RESUME) {
 					SpotifyManager.INSTANCE.pauseOrResume();

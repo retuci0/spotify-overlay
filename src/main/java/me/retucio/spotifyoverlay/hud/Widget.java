@@ -2,7 +2,6 @@ package me.retucio.spotifyoverlay.hud;
 
 import me.retucio.spotifyoverlay.util.DrawUtil;
 import me.retucio.spotifyoverlay.util.KeyUtil;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -64,7 +63,7 @@ public abstract class Widget {
         renderTooltip(gui, mx, my, delta);
     }
 
-    public void renderOnHudEditor(GuiGraphicsExtractor gui, int mx, int my, float delta) {
+    public void renderOnControlPanel(GuiGraphicsExtractor gui, int mx, int my, float delta) {
         int outlineColor, bgColor;
         outlineColor = Hud.INSTANCE.isSelected(this) ? Color.GREEN.getRGB() : Color.RED.darker().getRGB();
         bgColor = this.visible ? Color.GREEN.getRGB() : Color.RED.darker().getRGB();

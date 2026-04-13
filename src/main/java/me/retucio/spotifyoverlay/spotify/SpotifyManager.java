@@ -322,13 +322,22 @@ public class SpotifyManager {
         }
     }
 
-//    todo: impl
-//    public void forward(int ms);
-//
-//    public void backward(int ms) {
-//        forward(-ms);
-//    }
-//
+    public void seekTo(int position) {
+        try {
+            HttpURLConnection conn = getConnection("https://api.spotify.com/v1/me/player/seek?position_ms=" + position, "PUT");
+            writeEmptyBody(conn);
+
+            int resCode = conn.getResponseCode();
+            if (resCode == 204 || resCode == 200) {
+                SpotifyOverlay.LOGGER.info("skipped to {} ms", position);
+            } else {
+                SpotifyOverlay.LOGGER.error("couldn't skip to {} ms: HTTP {}", position, resCode);
+            }
+        } catch (Exception e) {
+            SpotifyOverlay.LOGGER.error("couldn't skip to {} ms", position, e);
+        }
+    }
+
 //    public void toggleShuffle();
 
 
