@@ -63,6 +63,11 @@ public class PauseOrResumeButton extends Button {
         );
     }
 
+    public void pauseOrResume() {
+        this.paused = !paused;
+        SpotifyManager.INSTANCE.pauseOrResume();
+    }
+
     @Override
     public boolean isHovered(int mx, int my) {
         int dx = mx - x;

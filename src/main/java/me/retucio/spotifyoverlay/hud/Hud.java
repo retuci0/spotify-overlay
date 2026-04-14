@@ -1,11 +1,16 @@
 package me.retucio.spotifyoverlay.hud;
 
 import me.retucio.spotifyoverlay.hud.screen.ControlPanelScreen;
+import me.retucio.spotifyoverlay.hud.widgets.Checkbox;
 import me.retucio.spotifyoverlay.hud.widgets.Overlay;
 import me.retucio.spotifyoverlay.hud.widgets.buttons.*;
+import me.retucio.spotifyoverlay.hud.widgets.checkboxes.LoopCheckbox;
+import me.retucio.spotifyoverlay.hud.widgets.checkboxes.ShuffleCheckbox;
 import me.retucio.spotifyoverlay.hud.widgets.sliders.*;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -34,6 +39,8 @@ public class Hud {
         widgets.add(new NextButton());
         widgets.add(new VolumeSlider());
         widgets.add(new ProgressSlider());
+        widgets.add(new ShuffleCheckbox());
+        widgets.add(new LoopCheckbox());
         widgets.add(new Overlay());
     }
 
@@ -94,6 +101,16 @@ public class Hud {
                 }
             }
             return null;
+    }
+
+    public List<Checkbox> getCheckboxes() {
+        List<Checkbox> checkboxes = new ArrayList<>();
+        for (Widget widget : widgets) {
+            if (widget instanceof Checkbox checkbox) {
+                checkboxes.add(checkbox);
+            }
+        }
+        return checkboxes;
     }
 
     public boolean isSelected(Widget widget) {

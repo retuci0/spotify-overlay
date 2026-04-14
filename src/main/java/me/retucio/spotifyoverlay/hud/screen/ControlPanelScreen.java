@@ -2,11 +2,14 @@ package me.retucio.spotifyoverlay.hud.screen;
 
 import me.retucio.spotifyoverlay.hud.Hud;
 import me.retucio.spotifyoverlay.hud.Widget;
+import me.retucio.spotifyoverlay.spotify.SpotifyManager;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Iterator;
 
@@ -31,6 +34,14 @@ public class ControlPanelScreen extends Screen {
     @Override
     public boolean mouseClicked(@NonNull MouseButtonEvent event, boolean doubled) {
         return super.mouseClicked(event, doubled);
+    }
+
+    @Override
+    public boolean keyPressed(@NonNull KeyEvent event) {
+        if (event.key() == GLFW.GLFW_KEY_SPACE) {
+            Hud.INSTANCE.getPauseOrResumeButton().pauseOrResume();
+        }
+        return super.keyPressed(event);
     }
 
     @Override

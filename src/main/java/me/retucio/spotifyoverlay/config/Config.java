@@ -18,6 +18,9 @@ public class Config implements Serializable {
 
     public int volume = 80;
 
+    public boolean shuffle;
+    public boolean loop;
+
     public static SpotifyApi spotifyApi = null;
 
     public static SpotifyApi getSpotifyApi() {

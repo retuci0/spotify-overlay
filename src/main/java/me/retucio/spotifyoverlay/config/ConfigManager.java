@@ -4,7 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import me.retucio.spotifyoverlay.hud.Hud;
+import me.retucio.spotifyoverlay.hud.widgets.Checkbox;
 import me.retucio.spotifyoverlay.hud.widgets.Overlay;
+import me.retucio.spotifyoverlay.hud.widgets.checkboxes.LoopCheckbox;
+import me.retucio.spotifyoverlay.hud.widgets.checkboxes.ShuffleCheckbox;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
 import me.retucio.spotifyoverlay.SpotifyOverlay;
 
@@ -12,6 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 
 public class ConfigManager {
@@ -67,6 +71,12 @@ public class ConfigManager {
         overlay.setVisible(config.visible);
 
         Hud.INSTANCE.getVolumeSlider().setValue(config.volume);
+
+        List<Checkbox> checkboxes = Hud.INSTANCE.getCheckboxes();
+        for (Checkbox checkbox : checkboxes) {
+            if (checkbox instanceof ShuffleCheckbox) checkbox.setChecked(config.shuffle);
+            else if (checkbox instanceof LoopCheckbox) checkbox.setChecked(config.loop);
+        }
 
         loaded = true;
         SpotifyOverlay.LOGGER.info("settings applied");

@@ -338,7 +338,37 @@ public class SpotifyManager {
         }
     }
 
-//    public void toggleShuffle();
+    public void toggleShuffle(boolean shuffle) {
+        try {
+            HttpURLConnection conn = getConnection("https://api.spotify.com/v1/me/player/shuffle?state=" + shuffle, "PUT");
+            writeEmptyBody(conn);
+
+            int resCode = conn.getResponseCode();
+            if (resCode == 204 || resCode == 200) {
+                SpotifyOverlay.LOGGER.info("toggled playback shuffle {}", shuffle ? "on" : "off");
+            } else {
+                SpotifyOverlay.LOGGER.info("couldn't toggle playback shuffle: HTTP {}", resCode);
+            }
+        } catch (Exception e) {
+            SpotifyOverlay.LOGGER.info("couldn't toggle playback shuffle", e);
+        }
+    }
+
+    public void toggleLoop(boolean loop) {
+        try {
+            HttpURLConnection conn = getConnection("https://api.spotify.com/v1/me/player/repeat?state=" + (loop ? "track" : "false"), "PUT");
+            writeEmptyBody(conn);
+
+            int resCode = conn.getResponseCode();
+            if (resCode == 204 || resCode == 200) {
+                SpotifyOverlay.LOGGER.info("toggled playback loop {}", loop ? "on" : "off");
+            } else {
+                SpotifyOverlay.LOGGER.info("couldn't toggle playback loop: HTTP {}", resCode);
+            }
+        } catch (Exception e) {
+            SpotifyOverlay.LOGGER.info("couldn't toggle playback loop", e);
+        }
+    }
 
 
     /* getters */
