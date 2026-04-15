@@ -105,7 +105,7 @@ public abstract class Widget {
                 y = newY;
             }
 
-            Config config = ConfigManager.INSTANCE.getConfig();
+            Config config = ConfigManager.getConfig();
             config.x = this.x;
             config.y = this.y;
             config.w = this.w;
@@ -167,7 +167,7 @@ public abstract class Widget {
         bgColor = this.visible ? Color.GREEN.getRGB() : Color.RED.darker().getRGB();
 
         gui.fill(x, y , x + w , y + h, bgColor);
-        DrawUtil.drawRectOutline(gui, x - PADDING, y - PADDING, w + PADDING, h + PADDING, PADDING, outlineColor);
+        DrawUtil.drawRectOutline(gui, x - PADDING, y - PADDING, w + 2 * PADDING, h + 2 * PADDING, PADDING, outlineColor);
         render(gui, mx, my, delta);
     }
 

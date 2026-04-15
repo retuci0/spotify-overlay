@@ -18,8 +18,13 @@ public class Config implements Serializable {
 
     public int volume = 80;
 
-    public boolean shuffle;
-    public boolean loop;
+    public boolean shuffle = false;
+    public boolean loop = false;
+
+    public boolean screenBoundaries = false;
+    public boolean arrowsMovement = true;
+    public boolean useSpaceKey = true;
+    public boolean blur = true;
 
     public static SpotifyApi spotifyApi = null;
 

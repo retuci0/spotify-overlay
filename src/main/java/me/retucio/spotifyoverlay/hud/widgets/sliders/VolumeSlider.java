@@ -48,7 +48,7 @@ public class VolumeSlider extends Slider {
 
     @Override
     protected void onChange() {
-        ConfigManager.INSTANCE.getConfig().volume = (int) value;
+        ConfigManager.getConfig().volume = (int) value;
     }
 
     @Override public int defaultX() { return mc.getWindow().getGuiScaledWidth() - 80; }

@@ -1,8 +1,9 @@
 package me.retucio.spotifyoverlay.hud.screen;
 
+import me.retucio.spotifyoverlay.config.ConfigManager;
 import me.retucio.spotifyoverlay.hud.Hud;
 import me.retucio.spotifyoverlay.hud.Widget;
-import me.retucio.spotifyoverlay.spotify.SpotifyManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -16,6 +17,7 @@ import java.util.Iterator;
 public class ControlPanelScreen extends Screen {
 
     public final static ControlPanelScreen INSTANCE = new ControlPanelScreen();
+    private final Minecraft mc = Minecraft.getInstance();
 
     protected ControlPanelScreen() {
         super(Component.nullToEmpty("control panel"));
@@ -23,6 +25,11 @@ public class ControlPanelScreen extends Screen {
 
     @Override
     public void extractRenderState(@NonNull GuiGraphicsExtractor gui, int mouseX, int mouseY, float delta) {
+        gui.pose().pushMatrix();
+        gui.pose().scale(2.0f);
+        gui.text(mc.font, "control panel", 10, 10, -1);
+        gui.pose().popMatrix();
+
         Iterator<Widget> it = Hud.INSTANCE.getWigets();
         while (it.hasNext()) {
             Widget widget = it.next();
@@ -38,7 +45,7 @@ public class ControlPanelScreen extends Screen {
 
     @Override
     public boolean keyPressed(@NonNull KeyEvent event) {
-        if (event.key() == GLFW.GLFW_KEY_SPACE) {
+        if (event.key() == GLFW.GLFW_KEY_SPACE && ConfigManager.getConfig().useSpaceKey) {
             Hud.INSTANCE.getPauseOrResumeButton().pauseOrResume();
         }
         return super.keyPressed(event);
@@ -48,5 +55,12 @@ public class ControlPanelScreen extends Screen {
     public void onClose() {
         Hud.INSTANCE.select(null);
         super.onClose();
+    }
+
+    @Override
+    protected void extractBlurredBackground(@NonNull GuiGraphicsExtractor gui) {
+        if (ConfigManager.getConfig().blur) {
+            super.extractBlurredBackground(gui);
+        }
     }
 }

@@ -67,11 +67,11 @@ public abstract class Slider extends Widget {
 
     public float getValue(int mx, int my) {
         float raw = min + percent(mx, my) * (max - min);
-        return Math.round(Math.max(min, Math.min(max, raw)) / increment) * increment;
+        return Math.round(Math.clamp(raw, min, max) / increment) * increment;
     }
 
     public void setValue(float value) {
-        this.value = value;
+        this.value = Math.clamp(value, min, max);
         onChange();
     }
 

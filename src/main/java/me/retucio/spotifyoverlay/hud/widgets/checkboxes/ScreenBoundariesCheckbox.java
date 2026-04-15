@@ -2,20 +2,17 @@ package me.retucio.spotifyoverlay.hud.widgets.checkboxes;
 
 import me.retucio.spotifyoverlay.config.ConfigManager;
 import me.retucio.spotifyoverlay.hud.widgets.Checkbox;
-import me.retucio.spotifyoverlay.spotify.SpotifyManager;
 
 
-public class ShuffleCheckbox extends Checkbox {
+public class ScreenBoundariesCheckbox extends Checkbox {
 
-    public ShuffleCheckbox() {
-        super("shuffle", "shuffle playlist", 20, 50, 10, false);
+    public ScreenBoundariesCheckbox() {
+        super("screen boundaries", "avoid moving the overlay out of the screen", 20, 120, 10, false);
     }
 
     @Override
     public void onToggle() {
-        SpotifyManager.INSTANCE.toggleShuffle(checked);
-        ConfigManager.getConfig().shuffle = checked;
-        super.onToggle();
+        ConfigManager.getConfig().screenBoundaries = checked;
     }
 
     @Override
@@ -25,7 +22,7 @@ public class ShuffleCheckbox extends Checkbox {
 
     @Override
     public int defaultY() {
-        return 50;
+        return 120;
     }
 
     @Override

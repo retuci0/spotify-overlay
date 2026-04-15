@@ -87,8 +87,8 @@ public class ConfigManager {
     }
 
 
-    public Config getConfig() {
-        return config;
+    public static Config getConfig() {
+        return INSTANCE.config;
     }
 
     public boolean loaded() {

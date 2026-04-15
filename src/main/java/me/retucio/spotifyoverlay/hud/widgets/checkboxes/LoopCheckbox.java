@@ -14,7 +14,7 @@ public class LoopCheckbox extends Checkbox {
     @Override
     public void onToggle() {
         SpotifyManager.INSTANCE.toggleLoop(checked);
-        ConfigManager.INSTANCE.getConfig().loop = checked;
+        ConfigManager.getConfig().loop = checked;
         super.onToggle();
     }
 

@@ -5,11 +5,11 @@ import com.mojang.blaze3d.platform.NativeImage;
 import me.retucio.spotifyoverlay.SpotifyOverlay;
 import me.retucio.spotifyoverlay.config.Config;
 import me.retucio.spotifyoverlay.config.ConfigManager;
+import me.retucio.spotifyoverlay.hud.Hud;
 import me.retucio.spotifyoverlay.util.ChatUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.resources.Identifier;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 
@@ -23,12 +23,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class SpotifyManager {
 
     public final static SpotifyManager INSTANCE = new SpotifyManager();
     private final Minecraft mc = Minecraft.getInstance();
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "spotifyoverlay-worker");
+        t.setDaemon(true);
+        return t;
+    });
 
     private Song currentSong = Song.empty();
     private int currentProgress = -1;
@@ -177,7 +185,7 @@ public class SpotifyManager {
 
                 Identifier id = Identifier.fromNamespaceAndPath(SpotifyOverlay.MOD_ID, "albumcover");
                 AbstractTexture oldTexture = mc.getTextureManager().getTexture(id);
-                if (oldTexture != null) oldTexture.close();
+                oldTexture.close();
 
                 mc.getTextureManager().register(id, new DynamicTexture(() -> "albumcover", currentCover));
             });
@@ -196,7 +204,7 @@ public class SpotifyManager {
                     .build()
                     .execute();
 
-            Config config = ConfigManager.INSTANCE.getConfig();
+            Config config = ConfigManager.getConfig();
             config.accessToken = newCreds.getAccessToken();
             config.refreshToken = newCreds.getRefreshToken();
             ConfigManager.INSTANCE.save();
@@ -322,6 +330,36 @@ public class SpotifyManager {
         }
     }
 
+    public void increaseVolume() {
+        Config config = ConfigManager.getConfig();
+
+        if (config.volume >= 100) {
+            config.volume = 100;
+            return;
+        }
+
+        increaseVolume(1);
+    }
+
+    public void increaseVolume(int amount) {
+        setVolume(ConfigManager.getConfig().volume + amount);
+    }
+
+    public void decreaseVolume() {
+        Config config = ConfigManager.getConfig();
+
+        if (config.volume <= 0) {
+            config.volume = 0;
+            return;
+        }
+
+        decreaseVolume(1);
+    }
+
+    public void decreaseVolume(int amount) {
+        setVolume(ConfigManager.getConfig().volume - amount);
+    }
+
     public void seekTo(int position) {
         try {
             HttpURLConnection conn = getConnection("https://api.spotify.com/v1/me/player/seek?position_ms=" + position, "PUT");
@@ -336,6 +374,10 @@ public class SpotifyManager {
         } catch (Exception e) {
             SpotifyOverlay.LOGGER.error("couldn't skip to {} ms", position, e);
         }
+    }
+
+    public void toggleShuffle() {
+        toggleShuffle(!ConfigManager.getConfig().shuffle);
     }
 
     public void toggleShuffle(boolean shuffle) {
@@ -390,7 +432,7 @@ public class SpotifyManager {
     }
 
     public Config getConfig() {
-        return ConfigManager.INSTANCE.getConfig();
+        return ConfigManager.getConfig();
     }
 
     @SuppressWarnings("deprecation")

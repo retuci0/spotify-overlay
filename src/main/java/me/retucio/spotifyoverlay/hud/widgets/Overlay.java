@@ -6,7 +6,6 @@ import me.retucio.spotifyoverlay.config.ConfigManager;
 import me.retucio.spotifyoverlay.hud.Widget;
 import me.retucio.spotifyoverlay.spotify.Song;
 import me.retucio.spotifyoverlay.spotify.SpotifyManager;
-import me.retucio.spotifyoverlay.util.KeyUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.FormattedText;
@@ -14,6 +13,7 @@ import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+
 
 public class Overlay extends Widget {
 
@@ -28,8 +28,8 @@ public class Overlay extends Widget {
     @Override
     public void render(GuiGraphicsExtractor gui, int mx, int my, float delta) {
         if (dragging) {
-            x = mx - dx;
-            y = my - dy;
+            x = ConfigManager.getConfig().screenBoundaries ? Math.clamp(mx - dx, 0, mc.getWindow().getGuiScaledWidth() - w) : mx - dx;
+            y = ConfigManager.getConfig().screenBoundaries ? Math.clamp(my - dy, 0, mc.getWindow().getGuiScaledHeight() - h) : my - dy;
         }
 
         Song current = SpotifyManager.INSTANCE.getCurrentSong();
@@ -101,18 +101,18 @@ public class Overlay extends Widget {
             }
         } else if (action == GLFW.GLFW_RELEASE) {
             dragging = false;
-            ConfigManager.INSTANCE.getConfig().x = this.x;
-            ConfigManager.INSTANCE.getConfig().y = this.y;
+            ConfigManager.getConfig().x = this.x;
+            ConfigManager.getConfig().y = this.y;
         }
 
-        ConfigManager.INSTANCE.getConfig().visible = this.visible;
+        ConfigManager.getConfig().visible = this.visible;
 
         super.onClick(mx, my, button, action);
     }
 
     @Override
     public void onKey(int key, int action) {
-        if (action == GLFW.GLFW_RELEASE) return;
+        if (action == GLFW.GLFW_RELEASE || !ConfigManager.getConfig().arrowsMovement) return;
         switch (key) {
             case GLFW.GLFW_KEY_UP       -> y -= PADDING;
             case GLFW.GLFW_KEY_DOWN     -> y += PADDING;
