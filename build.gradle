@@ -10,10 +10,18 @@ repositories { }
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-	include(implementation("com.google.code.gson:gson:${project.gson_version}"))
-	include(implementation("se.michaelthelin.spotify:spotify-web-api-java:${project.spotify_web_api_version}"))
+
+	include implementation("com.google.code.gson:gson:${project.gson_version}")
+
+	include implementation("org.apache.httpcomponents.client5:httpclient5:${project.http_client_version}")
+	include implementation("org.apache.httpcomponents.client5:httpclient5-cache:${project.http_client_version}")
+	include implementation("org.apache.httpcomponents.core5:httpcore5:${project.http_core_version}")
+	include implementation("org.apache.httpcomponents.core5:httpcore5-h2:${project.http_core_version}")
+
+	include implementation("se.michaelthelin.spotify:spotify-web-api-java:${project.spotify_web_api_version}")
 }
 
 processResources {
